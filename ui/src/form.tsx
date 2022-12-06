@@ -52,7 +52,7 @@ import { Text, TextL, TextM, TextS, TextXl, TextXs, XText } from './text'
 import { Textbox, XTextbox } from './textbox'
 import { TextAnnotator, XTextAnnotator } from './text_annotator'
 import { ImageAnnotator, XImageAnnotator } from './image_annotator'
-import { clas, cssVar, justifications, alignments, padding } from './theme'
+import { clas, cssVar, justifications, padding } from './theme'
 import { Toggle, XToggle } from './toggle'
 import { XToolTip } from './tooltip'
 import { bond } from './ui'
@@ -171,8 +171,6 @@ interface Inline {
   items: Component[]
   /** Specifies how to lay out the individual components. Defaults to 'start'. */
   justify?: 'start' | 'end' | 'center' | 'between' | 'around'
-  /** Specifies how the individual components are aligned on the vertical axis. Defaults to 'center'. */
-  align?: 'start' | 'end' | 'center' | 'baseline' | 'stretch'
   /** Whether to display the components inset from the parent form, with a contrasting background. */
   inset?: B
 }
@@ -216,11 +214,10 @@ const
     },
   })
 
-type Justification = 'start' | 'end' | 'center' | 'between' | 'around'
-type Alignment = 'start' | 'end' | 'center' | 'baseline' | 'stretch'
+type XComponentAlignment = 'start' | 'end' | 'center' | 'between' | 'around'
 
 export const
-  XComponents = ({ items, justify, align, inset }: { items: Component[], justify?: Justification, align?: Alignment, inset?: B }) => {
+  XComponents = ({ items, alignment, inset }: { items: Component[], alignment?: XComponentAlignment, inset?: B }) => {
     const
       components = items.map((m: any, i) => {
         const
@@ -228,7 +225,7 @@ export const
           [componentKey] = Object.keys(m),
           { name, visible = true, width = 'auto' } = m[componentKey],
           visibleStyles: React.CSSProperties = visible ? {} : { display: 'none' },
-          // TODO: Ugly, maybe use ui.inline's 'align' prop instead?
+          // TODO: Ugly, maybe introduce 'align' prop to ui.inline?
           alignSelf = componentKey === 'links' ? 'flex-start' : undefined
 
         return (
@@ -238,19 +235,12 @@ export const
           </div>
         )
       })
-    return <div
-      className={clas(justify ? css.horizontal : css.vertical, inset ? css.inset : '')}
-      style={{
-        justifyContent: justifications[justify || ''],
-        alignItems: alignments[align || ''],
-      }}
-    >{components}</div>
+    return <div className={clas(alignment ? css.horizontal : css.vertical, inset ? css.inset : '')} style={{ justifyContent: justifications[alignment || ''] }}>{components}</div>
   },
   XInline = ({ model: m }: { model: Inline }) => (
     <XComponents
       items={m.items}
-      justify={m.justify || 'start'}
-      align={m.align || 'center'}
+      alignment={m.justify || 'start'}
       inset={m.inset}
     />
   )
